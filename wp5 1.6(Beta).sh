@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #MK5 Internet Connection Sharing for Apple
-#v1.5
+#v1.6
 SCVER="1.6"
 #By TGYK
 #Special thanks to Bl1tz3dShad0w for testing and feedback for me
