@@ -64,7 +64,7 @@ tell application "System Events" to tell process "System Preferences"
 			end if
 		end try
 	end repeat
-	delay 1
+	delay 2
 
 	--disable Internet Sharing
 	repeat with r in rows of table 1 of scroll area 1 of group 1 of window "Sharing"
@@ -74,7 +74,7 @@ tell application "System Events" to tell process "System Preferences"
 			if sharingBool is true then click checkbox of r
 		end if
 	end repeat
-	delay 1
+	delay 2
 end tell
 ignoring application responses
 	tell application "System Preferences" to quit
@@ -104,7 +104,7 @@ tell application "System Events" to tell process "System Preferences"
 			select r
 		end if
 	end repeat
-	delay 1
+	delay 2
 	
 	--Select WiFi from dropdown
 	click (pop up buttons of group 1 of window "Sharing")
@@ -128,12 +128,12 @@ tell application "System Events" to tell process "System Preferences"
 			if sharingBool is false then click checkbox of r
 		end if
 	end repeat
-	delay 1
+	delay 2
 	
 	if (exists sheet 1 of window "Sharing") then
 		click button "Start" of sheet 1 of window "Sharing"
 	end if
-	delay 1
+	delay 2
 end tell
 ignoring application responses
 	tell application "System Preferences" to quit
@@ -156,14 +156,14 @@ tell application "System Events" to tell process "System Preferences"
 			end if
 		end try
 	end repeat
-	delay 1
+	delay 2
 	--find the checkbox for Internet Sharing and select the row so script can enable sharing through ethernet
 	repeat with r in rows of table 1 of scroll area 1 of group 1 of window "Sharing"
 		if (value of static text of r as text) starts with "Internet" then
 			select r
 		end if
 	end repeat
-	delay 1
+	delay 2
 	
 	--Select WiFi from dropdown
 	click (pop up buttons of group 1 of window "Sharing")
@@ -177,7 +177,7 @@ tell application "System Events" to tell process "System Preferences"
 			if enetBool is false then click checkbox of r2
 		end if
 	end repeat
-	delay 1
+	delay 2
 	
 	--enable Internet Sharing
 	repeat with r in rows of table 1 of scroll area 1 of group 1 of window "Sharing"
@@ -187,11 +187,11 @@ tell application "System Events" to tell process "System Preferences"
 			if (exists sheet 1 of window "Sharing") then
 				click button "Start" of sheet 1 of window "Sharing"
 			end if
-			delay 1
+			delay 2
 			click checkbox of r
 		end if
 	end repeat
-	delay 1
+	delay 2
 	
 end tell
 ignoring application responses
@@ -344,11 +344,9 @@ if [ ! -d /plistbackups ]; then
 		cp /Library/Preferences/SystemConfiguration/com.apple.nat.lockfile /plistbackups/
 		echo "Backed up old NAT lock file"
 	fi
-	if [[ $VERSION != "1010"* ]]; then
-		if [ -e /etc/bootpd.plist ]; then
-			cp /etc/bootpd.plist /plistbackups/
-			echo "Backed up old bootpd file"
-		fi
+	if [ -e /etc/bootpd.plist ]; then
+		cp /etc/bootpd.plist /plistbackups/
+		echo "Backed up old bootpd file"
 	fi
 	sleep 2
 fi
@@ -407,12 +405,14 @@ if [ -d /wpplist ] && [ $USEWPP == true ]; then
 	sleep 2
 
 	#Copy bootpd
-	if [[ $VERSION != "1010"* ]]; then
+	if [ -e /wpplist/bootpd.plist ]; then
 		cp /wpplist/bootpd.plist /etc/bootpd.plist
 		#Reload bootpd
-		kill -HUP $(pgrep bootpd)
-		sleep 2
-		echo "Reloaded bootpd file for DHCP"
+		if [[ $VERSION != "1010"* ]]; then
+			kill -HUP $(pgrep bootpd)
+			sleep 2
+			echo "Reloaded bootpd file for DHCP"
+		fi
 	fi
 	exit
 fi
@@ -420,6 +420,7 @@ fi
 
 #Use applescript to reliably create NAT file
 toggleICS
+sleep 2
 echo "NAT file created"
 
 #Write the NAT parameters to the file using the defaults command
@@ -479,7 +480,6 @@ echo "Copied completed config files"
 
 #Reload bootpd process
 if [[ $VERSION != "1010"* ]]; then
-	echo "Test"
 	kill -HUP $(pgrep bootpd)
 	sleep 2
 	
