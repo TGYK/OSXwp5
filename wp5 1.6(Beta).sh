@@ -415,7 +415,7 @@ if [ -d /wpplist ] && [ $USEWPP == true ]; then
 	sleep 1
 
 	#Copy bootpd
-	if [ $VERSION != "10101" ]; then
+	if [ $VERSION != "1010"* ]; then
 		cp /wpplist/bootpd.plist /etc/bootpd.plist
 		#Reload bootpd
 		kill -HUP $(pgrep bootpd)
