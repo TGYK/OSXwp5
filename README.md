@@ -1,4 +1,5 @@
-Current version: 1.6(Beta)
+#OSX Internet Connection Sharing, made automatic.
+##Current version: 1.6(Beta)
  
 Be sure to enable access for assistive devices(10.8 and lower)
 System Preferences > Accessibility > Check "Enable access for assistive devices" at bottom of window
@@ -13,10 +14,10 @@ sudo chmod +x <scriptname>
 sudo ./<scriptname> [options]
 
 Options:
--g		Specify gateway IP
--d		Specify DNS IP
--a		Specify alternate DNS IP
--h		Display brief help
--v		Display version info and exit
--n		Do not use completed configs (Generate new)
--r		Removes modified files, attempt to restore from backups
+* -g		Specify gateway IP
+* -d		Specify DNS IP
+* -a		Specify alternate DNS IP
+* -h		Display brief help
+* -v		Display version info and exit
+* -n		Do not use completed configs (Generate new)
+* -r		Removes modified files, attempt to restore from backups
