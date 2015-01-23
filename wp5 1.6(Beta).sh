@@ -213,7 +213,7 @@ fi
 VERSION=$(sw_vers -productVersion | tr -d '.')
 
 #Check for versions less than 10.7.5
-if [ $VERSION == "106"* ]; then
+if [[ $VERSION == "106"* ]]; then
 	echo "This script is unsupported on your OS version"
 	exit 2
 fi
@@ -289,7 +289,7 @@ while getopts ":rhvng:d:a:" opt; do
 				rm /Library/Preferences/SystemConfiguration/com.apple.nat.lockfile
 				echo "Removed old NAT lock file"
 			fi
-			if [ $VERSION != "1010"* ]; then
+			if [[ $VERSION != "1010"* ]]; then
 				if [ -e /etc/bootpd.plist ]; then
 					rm /etc/bootpd.plist
 					echo "Removed old bootpd file"
@@ -344,7 +344,7 @@ if [ ! -d /plistbackups ]; then
 		cp /Library/Preferences/SystemConfiguration/com.apple.nat.lockfile /plistbackups/
 		echo "Backed up old NAT lock file"
 	fi
-	if [ $VERSION != "1010"* ]; then
+	if [[ $VERSION != "1010"* ]]; then
 		if [ -e /etc/bootpd.plist ]; then
 			cp /etc/bootpd.plist /plistbackups/
 			echo "Backed up old bootpd file"
@@ -415,7 +415,7 @@ if [ -d /wpplist ] && [ $USEWPP == true ]; then
 	sleep 1
 
 	#Copy bootpd
-	if [ $VERSION != "1010"* ]; then
+	if [[ $VERSION != "1010"* ]]; then
 		cp /wpplist/bootpd.plist /etc/bootpd.plist
 		#Reload bootpd
 		kill -HUP $(pgrep bootpd)
@@ -432,7 +432,7 @@ echo "NAT file created"
 
 #Write the NAT parameters to the file using the defaults command
 defaults write /Library/Preferences/SystemConfiguration/com.apple.nat NAT -dict-add SharingNetworkNumberStart $NETWORKIP
-if [ $VERSION == "1010"* ]; then
+if [[ $VERSION == "1010"* ]]; then
 	defaults write /Library/Preferences/SystemConfiguration/com.apple.nat NAT -dict-add SharingNetworkNumberEnd $NETWORKEND
 	defaults write /Library/Preferences/SystemConfiguration/com.apple.nat NAT -dict-add SharingNetworkMask 255.255.255.0
 fi
@@ -462,7 +462,7 @@ echo "Set Primary DNS to $DNSIP Alternate to $DNSALT"
 sleep 1
 
 #Edit bootpd
-if [ $VERSION != "1010"* ]; then
+if [[ $VERSION != "1010"* ]]; then
 	/usr/libexec/PlistBuddy -c "set :Subnets:0:dhcp_domain_name_server:0 '$GATEWEAYIP'" /etc/bootpd.plist
 	/usr/libexec/PlistBuddy -c "set :Subnets:0:dhcp_router '$GATEWAYIP'" /etc/bootpd.plist
 	/usr/libexec/PlistBuddy -c "Set :Subnets:0:net_range:0 '$NETRANGE'" /etc/bootpd.plist
@@ -486,8 +486,10 @@ sleep 1
 echo "Copied completed config files"
 
 #Reload bootpd process
-if [ $VERSION != "1010"* ]; then
+if [[ $VERSION != "1010"* ]]; then
+	echo "Test"
 	kill -HUP $(pgrep bootpd)
 	sleep 1
+	
 	echo "Reloaded bootpd file for DHCP"
 fi
