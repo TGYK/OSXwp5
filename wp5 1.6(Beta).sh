@@ -25,7 +25,7 @@ SCVER="1.6"
 
 
 #Notes:
-#En0 is ethernet port 0
+#En0 is ethernet port 1
 #En3 is ethernet port 2
 #En1 is Wifi
 #En2 is usually bluetooth PAN
@@ -81,7 +81,6 @@ ignoring application responses
 end ignoring
 END
 }
-
 
 function enableICS {
 osascript << 'END2'
@@ -142,7 +141,6 @@ end ignoring
 END2
 }
 
-
 function toggleICS {
 osascript << 'END3'
 tell application "System Preferences"
@@ -202,7 +200,6 @@ end ignoring
 END3
 }
 
-
 #Check for root
 if [ "$(id -u)" != "0" ]; then
 	echo "This script must be run as root" 1>&2
@@ -217,7 +214,6 @@ if [[ $VERSION == "106"* ]]; then
 	echo "This script is unsupported on your OS version"
 	exit 2
 fi
-
 
 GATEWAYIP="172.16.42.42"
 NETWORKIP="172.16.42.0"
@@ -279,7 +275,7 @@ while getopts ":rhvng:d:a:" opt; do
 			if [ $? == "0" ]; then
 				echo "Killing ICS"
 				disableICS
-				sleep 1
+				sleep 2
 			fi
 			if [ -e /Library/Preferences/SystemConfiguration/com.apple.nat.plist ]; then
 				rm /Library/Preferences/SystemConfiguration/com.apple.nat.plist
@@ -289,11 +285,9 @@ while getopts ":rhvng:d:a:" opt; do
 				rm /Library/Preferences/SystemConfiguration/com.apple.nat.lockfile
 				echo "Removed old NAT lock file"
 			fi
-			if [[ $VERSION != "1010"* ]]; then
-				if [ -e /etc/bootpd.plist ]; then
-					rm /etc/bootpd.plist
-					echo "Removed old bootpd file"
-				fi
+			if [ -e /etc/bootpd.plist ]; then
+				rm /etc/bootpd.plist
+				echo "Removed old bootpd file"
 			fi
 			if [ -d /wpplist/ ]; then
 				rm -r /wpplist/
@@ -323,13 +317,19 @@ while getopts ":rhvng:d:a:" opt; do
 	esac
 done
 
-
 #Get netrange from GWIP
 IFS=. read ip1 ip2 ip3 ip4 <<< "$GATEWAYIP"
 temp=`echo $GATEWAYIP | cut -d"." -f1-3`
 temp2=`expr $ip4 + 1`
 NETRANGE=`echo $temp"."$temp2`
 
+#Check for and kill ICS if it's already running
+ICSPID=$(pgrep InternetSharing)
+if [ $? == "0" ]; then
+	echo "Killing ICS"
+	disableICS
+	sleep 2
+fi
 
 #Check for plist backup dir and if not there, create it and backup default configs, but do not overwrite them
 if [ ! -d /plistbackups ]; then
@@ -350,15 +350,7 @@ if [ ! -d /plistbackups ]; then
 			echo "Backed up old bootpd file"
 		fi
 	fi
-	sleep 1
-fi
-
-#Check for and kill ICS if it's already running
-ICSPID=$(pgrep InternetSharing)
-if [ $? == "0" ]; then
-	echo "Killing ICS"
-	disableICS
-	sleep 1
+	sleep 2
 fi
 
 #If completed configs exist, use them
@@ -394,7 +386,7 @@ if [ -d /wpplist ] && [ $USEWPP == true ]; then
 
 	#Start ICS
 	enableICS
-	sleep 1
+	sleep 2
 	echo "ICS started"
 
 	#Check for existence of bridge100 and if it's there, use it, otherwise, use en0
@@ -402,24 +394,24 @@ if [ -d /wpplist ] && [ $USEWPP == true ]; then
 	if [ $? == 0 ]; then
 		ifconfig bridge100 $WPGATEWAY netmask 255.255.255.0 up
 		echo "IP on bridge100 set to $WPGATEWAY"
-		sleep 1
+		sleep 2
 	else
 		ifconfig en0 $WPGATEWAY netmask 255.255.255.0 up
 		echo "IP on en0 set to $WPGATEWAY"
-		sleep 1
+		sleep 2
 	fi
 
 	#Set DNS
 	networksetup -setdnsservers Ethernet $WPDNS $WPALT
 	echo "Set Primary DNS to $WPDNS Alternate to $WPALT"
-	sleep 1
+	sleep 2
 
 	#Copy bootpd
 	if [[ $VERSION != "1010"* ]]; then
 		cp /wpplist/bootpd.plist /etc/bootpd.plist
 		#Reload bootpd
 		kill -HUP $(pgrep bootpd)
-		sleep 1
+		sleep 2
 		echo "Reloaded bootpd file for DHCP"
 	fi
 	exit
@@ -436,12 +428,12 @@ if [[ $VERSION == "1010"* ]]; then
 	defaults write /Library/Preferences/SystemConfiguration/com.apple.nat NAT -dict-add SharingNetworkNumberEnd $NETWORKEND
 	defaults write /Library/Preferences/SystemConfiguration/com.apple.nat NAT -dict-add SharingNetworkMask 255.255.255.0
 fi
-sleep 1
+sleep 2
 echo "NAT file edited"
 
 #Start sharing again
 enableICS
-sleep 1
+sleep 2
 echo "ICS started"
 
 #Check for existence of bridge100 and if it's there, use it, otherwise, use en0
@@ -449,24 +441,24 @@ echo "ICS started"
 	if [ $? == 0 ]; then
 		ifconfig bridge100 $GATEWAYIP netmask 255.255.255.0 up
 		echo "IP on bridge100 set to $GATEWAYIP"
-		sleep 1
+		sleep 2
 	else
 		ifconfig en0 $GATEWAYIP netmask 255.255.255.0 up
 		echo "IP on en0 set to $GATEWAYIP"
-		sleep 1
+		sleep 2
 	fi
 
 #Set DNS
 networksetup -setdnsservers Ethernet $DNSIP $DNSALT
 echo "Set Primary DNS to $DNSIP Alternate to $DNSALT"
-sleep 1
+sleep 2
 
 #Edit bootpd
 if [[ $VERSION != "1010"* ]]; then
 	/usr/libexec/PlistBuddy -c "set :Subnets:0:dhcp_domain_name_server:0 '$GATEWEAYIP'" /etc/bootpd.plist
 	/usr/libexec/PlistBuddy -c "set :Subnets:0:dhcp_router '$GATEWAYIP'" /etc/bootpd.plist
 	/usr/libexec/PlistBuddy -c "Set :Subnets:0:net_range:0 '$NETRANGE'" /etc/bootpd.plist
-sleep 1
+sleep 2
 echo "Rewritten bootpd file for DHCP"
 fi
 
@@ -474,7 +466,7 @@ fi
 if [ ! -d /wpplist ]; then
 	mkdir /wpplist
 	touch /wpplist/params
-	sleep 1
+	sleep 2
 	echo "Made backup directory for completed config files"
 fi
 cp /Library/Preferences/SystemConfiguration/com.apple.nat.plist /wpplist
@@ -482,14 +474,14 @@ cp /etc/bootpd.plist /wpplist
 echo $GATEWAYIP > /wpplist/params
 echo $DNSIP >> /wpplist/params
 echo $DNSALT >> /wpplist/params
-sleep 1
+sleep 2
 echo "Copied completed config files"
 
 #Reload bootpd process
 if [[ $VERSION != "1010"* ]]; then
 	echo "Test"
 	kill -HUP $(pgrep bootpd)
-	sleep 1
+	sleep 2
 	
 	echo "Reloaded bootpd file for DHCP"
 fi
