@@ -10,7 +10,9 @@ System Preferences > Security & Privacy > Select "Privacy" tab at top of window 
 If you ran the script before adding it to assistive devices/allowing to control computer, OR you used a script version prior to 1.6, you must remove the /wpplist folder. This can be achieved with 1.6 by running with the -r or the -n options. -r will restore backed up configs, -n will simply generate new configs.
 
 USAGE:
+
 sudo chmod +x scriptname
+
 sudo ./scriptname [options]
 
 Options:
