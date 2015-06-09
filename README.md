@@ -1,5 +1,5 @@
 #OSX Internet Connection Sharing, made automatic.
-##Current version: 1.6(Beta)
+##Current version: 1.7(Beta)
  
 Be sure to enable access for assistive devices(10.8 and lower)
 System Preferences > Accessibility > Check "Enable access for assistive devices" at bottom of window
