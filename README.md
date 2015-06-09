@@ -25,4 +25,4 @@ Options:
 ##IMPORTANT NOTES:
 * If you run the script on OS X 10.10 Yosemite and get messages saying osascript is not allowed assistive access, please follow the instructions above, and enable assistive access for the Terminal, or however you run the script.
 * If you run the script on OS X 10.10 Yosemite and get messages claiming that the IP was changed on an enX interface, please manually disable sharing, run the script with the -r option, then again with the -n option.
-* If you ran the script before adding it to assistive devices/allowing to control computer, OR you used a script version prior to 1.6, you must remove the /wpplist folder. This can be achieved with 1.6 by running with the -r or the -n options. -r will restore backed up configs, -n will simply generate new configs.
+* If you ran the script before adding it to assistive devices/allowing to control computer, OR you used a script version prior to 1.6, you must remove the /wpplist folder. This can be achieved with 1.6+ by running with the -r or the -n options. -r will restore backed up configs, -n will simply generate new configs.
